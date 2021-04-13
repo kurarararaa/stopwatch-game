@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <cracker-background />
     <div>
       <Logo />
       <h1 class="title">
@@ -45,10 +46,12 @@
 <script>
 import Timer from '~/components/Timer.vue'
 import Cracker from '~/components/Cracker.vue'
+import CrackerBackground from '~/components/CrackerBackground.vue'
 export default {
   components: {
     Timer,
-    Cracker
+    Cracker,
+    CrackerBackground,
   },
   data(){
     str: String
@@ -59,7 +62,7 @@ export default {
       interval : 0, // 計測用
       diffSecconds : 9999999, // 基準値との差
       score : 0, // 絶対値で取得
-      settingSeconds: 1.000, // 設定値                
+      settingSeconds: 1.000, // 設定値
       Vectur: {
         x: 0,
         y: 0,
@@ -159,7 +162,7 @@ export default {
       this.isStart = false;
       clearInterval(this.timer);
       console.log('interval:' + this.interval.toFixed(3));
-      console.log('timer:' + this.timer.toFixed(3)); 
+      console.log('timer:' + this.timer.toFixed(3));
       this.resultScore();
     },
     /**
@@ -249,12 +252,12 @@ export default {
       function tick() {
         var newFireworks = [];
         ctx.clearRect(0, 0, W, H);
-        
+
         fireworks.forEach(function (firework) {
           firework.draw();
           if (!firework.done) newFireworks.push(firework);
         })
-        
+
         fireworks = newFireworks;
         window.requestAnimationFrame(tick);
       }
@@ -266,19 +269,19 @@ export default {
 
       Vector.prototype = {
         constructor: Vector,
-        
+
         add: function (vector) {
           this.x += vector.x;
           this.y += vector.y;
         },
-        
+
         diff: function (vector) {
           var target = this.copy();
           return Math.sqrt(
             (target.x-=vector.x) * target.x + (target.y-=vector.y) * target.y
           )
         },
-        
+
         copy: function () {
           return new Vector(this.x, this.y);
         }
@@ -303,12 +306,12 @@ export default {
           Math.cos(this.angle) * this.speed,
           Math.sin(this.angle) * this.speed
         )
-        
+
         this.particals = [];
         this.prevPositions = [];
-        
+
         var colorSet = colors[Math.round(Math.random() * (colors.length -1))];
-        
+
         for (var i=0; i<this.spread; i++) {
           this.particals.push(new Partical(target.copy(), colorSet));
         }
@@ -316,19 +319,19 @@ export default {
 
       Firework.prototype = {
         constructor: Firework,
-        
+
         draw: function () {
           var last = this.prevPositions[this.prevPositions.length -1] || this.pos;
-          
+
           ctx.beginPath();
           ctx.moveTo(last.x, last.y);
           ctx.lineTo(this.pos.x, this.pos.y);
           ctx.strokeStyle = 'rgba(255,255,255,.7)';
           ctx.stroke();
-          
+
           this.update();
         },
-        
+
         update: function () {
           if (this.start.diff(this.pos) >= this.distance) {
             var newParticals = [];
@@ -336,14 +339,14 @@ export default {
               partical.draw();
               if (!partical.done) newParticals.push(partical);
             });
-            
+
             this.particals = newParticals;
             this.prevPositions = [];
-            
+
             if (!newParticals.length) this.done = true;
           } else {
             this.prevPositions.push(this.pos.copy());
-            
+
             if (this.prevPositions.length > 8) {
               this.prevPositions.shift();
             }
@@ -366,31 +369,31 @@ export default {
 
       Partical.prototype = {
         constructor: Partical,
-        
+
         draw: function () {
           var last = this.prevPositions[this.prevPositions.length -1] || this.pos;
-          
+
           ctx.beginPath();
           ctx.moveTo(last.x, last.y);
           ctx.lineTo(this.pos.x, this.pos.y);
           ctx.strokeStyle = this.color + this.alpha + ')';
           ctx.stroke();
-          
+
           this.update();
         },
-        
+
         update: function () {
           if (this.alpha <= 0) {
             this.done = true;
           } else {
             this.prevPositions.push(this.pos.copy());
-            
+
             if (this.prevPositions.length > 10) this.prevPositions.shift();
             if (this.speed > 1) this.speed -= this.ease;
-            
+
             this.alpha -= 0.01;
             this.gravity += 0.01;
-            
+
             this.pos.add({
               x: Math.cos(this.angle) * this.speed,
               y: Math.sin(this.angle) * this.speed + this.gravity
@@ -404,16 +407,16 @@ export default {
         target = target || new Vector(Math.random() * W, Math.random() * (H - 300));
         fireworks.push(new Firework(startPos, target));
       }
-  
+
       canvas.addEventListener('click', function (e) {
         addFirework(new Vector(e.clientX, e.clientY))
       }, false);
-  
+
       function randomFirework() {
         addFirework();
         window.setTimeout(randomFirework, Math.random() * 500);
       }
-  
+
       tick();
       randomFirework()
     }
