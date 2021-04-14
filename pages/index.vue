@@ -1,15 +1,11 @@
 <template>
   <div class="container">
+    <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
     <cracker-background />
     <div>
       <Logo />
       <h1 class="title">
       </h1>
-      <div>
-        <button @click="initFunction()">花火のテスト用</button>
-        <!-- 花火のテスト -->
-        <canvas id="canvas"></canvas>
-      </div>
       <div class="links">
         <a
           href="https://nuxtjs.org/"
@@ -34,23 +30,15 @@
         <p class="timer">{{interval.toFixed(3)}}</p>
       </div>
       <button class="btn" @click="startTimer()" v-show="!isStart">Start</button>
-      <button class="btn" @click="stopTimer()" v-show="isStart">Stop</button>
-    </div>
-    <div>
-      <button @click="hanabi()">hanabi</button>
-      <canvas id="canvas"></canvas>
+      <button class="btn" id="testBtn" @click="stopTimer()" v-show="isStart">Stop</button>
     </div>
   </div>
 </template>
 
 <script>
-import Timer from '~/components/Timer.vue'
-import Cracker from '~/components/Cracker.vue'
 import CrackerBackground from '~/components/CrackerBackground.vue'
 export default {
   components: {
-    Timer,
-    Cracker,
     CrackerBackground,
   },
   data(){
@@ -63,91 +51,6 @@ export default {
       diffSecconds : 9999999, // 基準値との差
       score : 0, // 絶対値で取得
       settingSeconds: 1.000, // 設定値
-      Vectur: {
-        x: 0,
-        y: 0,
-        getX() {
-          return this.x
-        },
-        getY() {
-          return this.y
-        },
-        setX(x) {
-          this.x = x
-        },
-        setY(y) {
-          this.y = y
-        },
-        getAngle() {
-          return Math.atan2(this.y, this.x)
-        },
-        getLength() {
-          return (Math.sqrt(this.x * this.x + this.y * this.y))
-        },
-        setAngle(angle) {
-          const length = this.getLength()
-          this.x = Math.cos(angle) * length
-          this.y = Math.sin(angle) * length
-        },
-        setLength(length) {
-          const angle = this.getAngle()
-          this.x = Math.cos(angle) * length;
-          this.y = Math.sin(angle) * length
-        },
-        create(x, y) {
-          const obj = Object.create(this)
-
-          obj.setX(x)
-          obj.setY(y)
-
-          return obj
-        },
-        add(v2) {
-          const x = this.x + v2.x
-          const y = this.y + v2.y
-
-          return this.create(x, y)
-        },
-        addTo(v2) {
-          v2.x += this.getX()
-          v2.y += this.getY()
-        },
-        subtract(v2) {
-          const x = this.x - v2.x
-          const y = this.y - v2.y
-
-          const o = this.create(x, y)
-          return o
-        },
-        subtractFrom(v2) {
-          v2.setX(v2.getX() - this.getX())
-          v2.setY(v2.getY() - this.getY())
-        },
-        multiply(val) {
-          this.x *= val
-          this.y *= val
-        }
-      },
-      Particle: {
-        position: null,
-        velocity: null,
-        gravity: null,
-        create(x, y, speed, angle, grav) {
-          const obj = Object.create(this)
-          obj.position = data().Vectur.create(x, y)
-          obj.velocity = this.Vectur.create(0, 0)
-          obj.gravity = this.Vectur.create(0, grav || 0)
-
-          obj.velocity.setLength(speed)
-          obj.velocity.setAngle(angle)
-
-          return obj
-        },
-        update() {
-          this.velocity.addTo(this.position)
-          this.gravity.addTo(this.velocity)
-        }
-      }
     }
   },
   methods:{
@@ -156,7 +59,7 @@ export default {
       this.isStart = true;
       this.start = Date.now();
       // 10msごとに現在時刻とstartを押した時刻の差を足す
-      this.timer = setInterval(()=>{ this.interval =(Date.now() - this.start) * 0.001;}, 1);
+      this.timer = setInterval(()=>{ this.interval =(Date.now() - this.start) * 0.001;}, 10);
     },
     stopTimer(){
       this.isStart = false;
@@ -174,253 +77,10 @@ export default {
 
       console.log('スコア:' + this.diffSecconds);
       console.log('絶対値：' + this.score);
-    },
-    initFunction() {
-      const canvas = document.getElementById('canvas')
-      const context = canvas.getContext('2d')
-      const w = canvas.width = window.innerWidth
-      const h = canvas.height = window.innerHeight
-
-      context.fillStyle = 'rgb(5, 10, 25)'
-      context.fillRect(0, 0, w, h)
-
-      const x = 788
-      const y = 454
-
-      console.log(x)
-      const particles = []
-      const colors = []
-      const numParticles = 500
-      for (let i = 0; i < numParticles; i++) {
-        particles.push(this.Particle.create(0, 0, Math.random() * 7, Math.random() * 2 * Math.PI, 0.1))
-
-        const r = Math.round(Math.random() * 256)
-        const g = Math.round(Math.random() * 256)
-        const b = Math.round(Math.random() * 256)
-
-        colors[i] = 'rgba(' + r + ',' + g + ',' + b + ',1)'
-        }
-
-        update()
-        context.fillStyle = 'rgb(5, 10, 25)'
-        context.fillRect(0, 0, w, h)
-
-        const r = 1.5
-
-        function update() {
-          context.clearRect(0, 0, w, h)
-          context.save()
-          context.fillStyle = 'rgb(5, 10, 25)'
-          context.fillRect(0, 0, w, h)
-
-          context.translate(x, y)
-          for (let i = 0; i < particles.length; i++) {
-
-            context.fillStyle = colors[i]
-            context.beginPath()
-            context.arc(particles[i].position.getX(), particles[i].position.getY(), Math.round(r), 0, Math.PI * 2)
-            context.fill()
-
-            particles[i].update()
-          }
-
-          context.restore()
-
-          removeExtra()
-          window.requestAnimationFrame(update)
-        }
-
-        function removeExtra() {
-          for (let i = 0; i < particles.length; i++) {
-            if (particles[i].position.x - 50 > w || particles[i].position.x + 50 < -w / 2 ||
-            particles[i].position.y - 50 > h || particles[i].position.y + 50 < -h / 2) {
-              particles.splice(i, 1)
-              colors.splice(i, 1)
-            }
-          }
-        }
-    },
-    hanabi() {
-      var canvas = document.querySelector('canvas'),
-          ctx = canvas.getContext('2d'),
-          W = canvas.width = window.innerWidth,
-          H = canvas.height = window.innerHeight,
-          maxP = 700,
-          minP = 1000,
-          fireworks = [];
-
-      function tick() {
-        var newFireworks = [];
-        ctx.clearRect(0, 0, W, H);
-
-        fireworks.forEach(function (firework) {
-          firework.draw();
-          if (!firework.done) newFireworks.push(firework);
-        })
-
-        fireworks = newFireworks;
-        window.requestAnimationFrame(tick);
-      }
-
-      function Vector(x, y) {
-        this.x = x;
-        this.y = y;
-      }
-
-      Vector.prototype = {
-        constructor: Vector,
-
-        add: function (vector) {
-          this.x += vector.x;
-          this.y += vector.y;
-        },
-
-        diff: function (vector) {
-          var target = this.copy();
-          return Math.sqrt(
-            (target.x-=vector.x) * target.x + (target.y-=vector.y) * target.y
-          )
-        },
-
-        copy: function () {
-          return new Vector(this.x, this.y);
-        }
-      }
-
-      var colors = [
-        ['rgba(179,255,129,', 'rgba(0,255,0,'], //green / white
-        ['rgba(0,0,255,', 'rgba(100,217,255,'], //blue / cyan
-        ['rgba(255,0,0,', 'rgba(255,255,0,'], //red / yellow
-        ['rgba(145,0,213,', 'rgba(251,144,204,'] //purple / pink
-      ]
-
-      function Firework(start, target, speed) {
-        this.start = start;
-        this.pos = this.start.copy();
-        this.target = target;
-        this.spread = Math.round(Math.random() * (maxP-minP)) + minP;
-        this.distance = target.diff(start);
-        this.speed = speed || Math.random() * 5 + 15;
-        this.angle = Math.atan2(target.y - start.y, target.x - start.x);
-        this.velocity = new Vector(
-          Math.cos(this.angle) * this.speed,
-          Math.sin(this.angle) * this.speed
-        )
-
-        this.particals = [];
-        this.prevPositions = [];
-
-        var colorSet = colors[Math.round(Math.random() * (colors.length -1))];
-
-        for (var i=0; i<this.spread; i++) {
-          this.particals.push(new Partical(target.copy(), colorSet));
-        }
-      }
-
-      Firework.prototype = {
-        constructor: Firework,
-
-        draw: function () {
-          var last = this.prevPositions[this.prevPositions.length -1] || this.pos;
-
-          ctx.beginPath();
-          ctx.moveTo(last.x, last.y);
-          ctx.lineTo(this.pos.x, this.pos.y);
-          ctx.strokeStyle = 'rgba(255,255,255,.7)';
-          ctx.stroke();
-
-          this.update();
-        },
-
-        update: function () {
-          if (this.start.diff(this.pos) >= this.distance) {
-            var newParticals = [];
-            this.particals.forEach(function (partical) {
-              partical.draw();
-              if (!partical.done) newParticals.push(partical);
-            });
-
-            this.particals = newParticals;
-            this.prevPositions = [];
-
-            if (!newParticals.length) this.done = true;
-          } else {
-            this.prevPositions.push(this.pos.copy());
-
-            if (this.prevPositions.length > 8) {
-              this.prevPositions.shift();
-            }
-
-            this.pos.add(this.velocity);
-          }
-        }
-      }
-
-      function Partical(pos, colors) {
-        this.pos = pos;
-        this.ease = 0.2;
-        this.speed = Math.random() * 6 + 2;
-        this.gravity = Math.random() * 3 + 0.1;
-        this.alpha = .8;
-        this.angle = Math.random() * (Math.PI*2);
-        this.color = colors[Math.round(Math.random() * (colors.length - 1))];
-        this.prevPositions = [];
-      }
-
-      Partical.prototype = {
-        constructor: Partical,
-
-        draw: function () {
-          var last = this.prevPositions[this.prevPositions.length -1] || this.pos;
-
-          ctx.beginPath();
-          ctx.moveTo(last.x, last.y);
-          ctx.lineTo(this.pos.x, this.pos.y);
-          ctx.strokeStyle = this.color + this.alpha + ')';
-          ctx.stroke();
-
-          this.update();
-        },
-
-        update: function () {
-          if (this.alpha <= 0) {
-            this.done = true;
-          } else {
-            this.prevPositions.push(this.pos.copy());
-
-            if (this.prevPositions.length > 10) this.prevPositions.shift();
-            if (this.speed > 1) this.speed -= this.ease;
-
-            this.alpha -= 0.01;
-            this.gravity += 0.01;
-
-            this.pos.add({
-              x: Math.cos(this.angle) * this.speed,
-              y: Math.sin(this.angle) * this.speed + this.gravity
-            });
-          }
-        }
-      }
-
-      function addFirework(target) {
-        var startPos = new Vector(W/2, H);
-        target = target || new Vector(Math.random() * W, Math.random() * (H - 300));
-        fireworks.push(new Firework(startPos, target));
-      }
-
-      canvas.addEventListener('click', function (e) {
-        addFirework(new Vector(e.clientX, e.clientY))
-      }, false);
-
-      function randomFirework() {
-        addFirework();
-        window.setTimeout(randomFirework, Math.random() * 500);
-      }
-
-      tick();
-      randomFirework()
+      this.$foo()
     }
   }
+  
 }
 </script>
 

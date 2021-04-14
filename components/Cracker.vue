@@ -106,11 +106,10 @@ export default {
       context.fillRect(0, 0, w, h)
 
       document.body.addEventListener('mousedown', function(event) {
-        console.log('test成功')
-        const x = event.clientX
-        const y = event.clientY
+        const x = 100
+        const y = 200
 
-        console.log(event.clientX)
+        console.log(x)
         const particles = []
         const colors = []
         const numParticles = 500

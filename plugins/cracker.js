@@ -88,6 +88,10 @@ var Particle = {
   }
 }
 
+const foo = (interval) => {
+  console.log('外部メソッド呼び出し成功' + interval)
+}
+
 const CrackerDirective = {
   bind: function(el, binding, vnode) {
     let context = el.getContext('2d'),
@@ -98,11 +102,12 @@ const CrackerDirective = {
     context.fillRect(0, 0, w, h);
 
     Vue.nextTick(function() {
-      el.addEventListener('mousedown', function(event) {
-        var x = event.pageX - el.offsetLeft,
-          y = event.pageY - el.offsetTop;
+      const testBtn = document.getElementById("testBtn")
+      testBtn.onclick = function() {
 
-        console.log(event.clientX);
+        var x = 559,
+          y = 150;
+
         var particles = [],
           colors = [],
           numParticles = 500;
@@ -152,9 +157,70 @@ const CrackerDirective = {
             }
           }
         }
-      })
+      }
     })
   }
 }
 
+const testMethod = () => {
+  
+  var x = 559,
+    y = 150;
+
+  console.log(event.clientX);
+  var particles = [],
+    colors = [],
+    numParticles = 500;
+  for (var i = 0; i < numParticles; i++) {
+    particles.push(Particle.create(0, 0, Math.random() * 7, Math.random() * 2 * Math.PI, 0.1));
+
+    var r = Math.round(Math.random() * 256),
+      g = Math.round(Math.random() * 256),
+      b = Math.round(Math.random() * 256);
+
+    colors[i] = 'rgba(' + r + ',' + g + ',' + b + ',1)';
+  }
+
+  update();
+  context.fillStyle = 'rgb(5,10,25)';
+  context.fillRect(0, 0, w, h);
+  var r = 1.5;
+
+  function update() {
+    context.clearRect(0, 0, w, h);
+    context.save();
+    context.fillStyle = 'rgb(5,10,25)';
+    context.fillRect(0, 0, w, h);
+
+    context.translate(x, y);
+    for (var i = 0; i < particles.length; i++) {
+
+      context.fillStyle = colors[i];
+      context.beginPath();
+      context.arc(particles[i].position.getX(), particles[i].position.getY(), Math.round(r), 0, Math.PI * 2);
+      context.fill();
+
+      particles[i].update();
+    }
+
+    context.restore();
+
+    removeExtra();
+    window.requestAnimationFrame(update);
+  }
+
+  function removeExtra() {
+    for (var i = 0; i < particles.length; i++) {
+      if (particles[i].position.x - 50 > w || particles[i].position.x + 50 < -w / 2 || particles[i].position.y - 50 > h || particles[i].position.y + 50 < -h / 2) {
+        particles.splice(i, 1);
+        colors.splice(i, 1);
+      }
+    }
+  }
+}
+
 Vue.directive('cracker', CrackerDirective)
+
+export default ({}, inject) => {
+  inject('foo', foo)
+}

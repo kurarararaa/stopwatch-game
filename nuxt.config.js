@@ -21,7 +21,10 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '~/plugins/cracker.js'
+    '~/plugins/cracker.js',
+    // ここを追加
+    '@/plugins/cracker',
+    '@/pages/index.vue'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
