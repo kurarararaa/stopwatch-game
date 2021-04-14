@@ -94,6 +94,9 @@ const foo = (interval) => {
 
 const CrackerDirective = {
   bind: function(el, binding, vnode) {
+
+    console.log('ディレクティブに渡された trigger の値：', binding.arg)
+
     let context = el.getContext('2d'),
     w = el.width = window.innerWidth,
     h = el.height = window.innerHeight;
@@ -163,7 +166,7 @@ const CrackerDirective = {
 }
 
 const testMethod = () => {
-  
+
   var x = 559,
     y = 150;
 
