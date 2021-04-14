@@ -2,6 +2,7 @@
   <div class="container">
     <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
     <cracker-background />
+    <CrackerBackground :showCracker="showCracker" />
     <div>
       <Logo />
       <h1 class="title">
@@ -51,10 +52,12 @@ export default {
       diffSecconds : 9999999, // 基準値との差
       score : 0, // 絶対値で取得
       settingSeconds: 1.000, // 設定値
+      showCracker: false
     }
   },
   methods:{
     startTimer(){
+      this.showCracker = false
       console.log(this.timer);
       this.isStart = true;
       this.start = Date.now();
@@ -77,7 +80,9 @@ export default {
 
       console.log('スコア:' + this.diffSecconds);
       console.log('絶対値：' + this.score);
-      this.$foo()
+      if (this.score < 0.100) {
+        this.showCracker = true
+      }
     }
   }
   
