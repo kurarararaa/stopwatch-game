@@ -27,7 +27,7 @@ export default {
           return Math.atan2(this.y, this.x)
         },
         getLength() {
-          return (Math.sqrt(this.x * this.x + this.y * this.y))
+          return Math.sqrt(this.x * this.x + this.y * this.y)
         },
         setAngle(angle) {
           const length = this.getLength()
@@ -36,7 +36,7 @@ export default {
         },
         setLength(length) {
           const angle = this.getAngle()
-          this.x = Math.cos(angle) * length;
+          this.x = Math.cos(angle) * length
           this.y = Math.sin(angle) * length
         },
         create(x, y) {
@@ -71,7 +71,7 @@ export default {
         multiply(val) {
           this.x *= val
           this.y *= val
-        }
+        },
       },
       Particle: {
         position: null,
@@ -91,21 +91,21 @@ export default {
         update() {
           this.velocity.addTo(this.position)
           this.gravity.addTo(this.velocity)
-        }
-      }
+        },
+      },
     }
   },
   methods: {
     initFunction() {
       const canvas = document.getElementById('canvas')
       const context = canvas.getContext('2d')
-      const w = canvas.width = window.innerWidth
-      const h = canvas.height = window.innerHeight
+      const w = (canvas.width = window.innerWidth)
+      const h = (canvas.height = window.innerHeight)
 
       context.fillStyle = 'rgb(5, 10, 25)'
       context.fillRect(0, 0, w, h)
 
-      document.body.addEventListener('mousedown', function(event) {
+      document.body.addEventListener('mousedown', function (event) {
         const x = 100
         const y = 200
 
@@ -114,7 +114,15 @@ export default {
         const colors = []
         const numParticles = 500
         for (let i = 0; i < numParticles; i++) {
-          particles.push(Particle.create(0, 0, Math.random() * 7, Math.random() * 2 * Math.PI, 0.1))
+          particles.push(
+            Particle.create(
+              0,
+              0,
+              Math.random() * 7,
+              Math.random() * 2 * Math.PI,
+              0.1
+            )
+          )
 
           const r = Math.round(Math.random() * 256)
           const g = Math.round(Math.random() * 256)
@@ -137,10 +145,15 @@ export default {
 
           context.translate(x, y)
           for (let i = 0; i < particles.length; i++) {
-
             context.fillStyle = colors[i]
             context.beginPath()
-            context.arc(particles[i].position.getX(), particles[i].position.getY(), Math.round(r), 0, Math.PI * 2)
+            context.arc(
+              particles[i].position.getX(),
+              particles[i].position.getY(),
+              Math.round(r),
+              0,
+              Math.PI * 2
+            )
             context.fill()
 
             particles[i].update()
@@ -154,16 +167,20 @@ export default {
 
         function removeExtra() {
           for (let i = 0; i < particles.length; i++) {
-            if (particles[i].position.x - 50 > w || particles[i].position.x + 50 < -w / 2 ||
-            particles[i].position.y - 50 > h || particles[i].position.y + 50 < -h / 2) {
+            if (
+              particles[i].position.x - 50 > w ||
+              particles[i].position.x + 50 < -w / 2 ||
+              particles[i].position.y - 50 > h ||
+              particles[i].position.y + 50 < -h / 2
+            ) {
               particles.splice(i, 1)
               colors.splice(i, 1)
             }
           }
         }
       })
-    }    
-  }
+    },
+  },
 }
 </script>
 

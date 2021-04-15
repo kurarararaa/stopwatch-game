@@ -1,5 +1,5 @@
 <template>
-  <canvas class="cracker-background" v-cracker:[trigger]></canvas>
+  <canvas v-cracker:[trigger] class="cracker-background"></canvas>
 </template>
 <script>
 export default {
@@ -11,13 +11,13 @@ export default {
       trigger: false,
     }
   },
+  watch: {
+    showCracker(val, oldVal) {
+      this.trigger = val
+    },
+  },
   mounted() {
     this.trigger = this.showCracker
-  },
-  watch: {
-    showCracker: function(val, oldVal) {
-      this.trigger = val
-    }
   },
 }
 </script>
@@ -28,5 +28,6 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
+  background-color: #050a19;
 }
 </style>
