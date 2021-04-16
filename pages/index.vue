@@ -8,12 +8,16 @@
     <CrackerBackground :show-cracker="showCracker" />
     <div class="game-boy">
       <div class="game-boy-screen">
-        <p class="timer">{{ interval.toFixed(5) }}</p>
+        <p class="timer" v-show="mode.easy">{{ interval.toFixed(3) }}</p>
+        <p class="timer" v-show="!mode.easy && !hard">{{ interval.toFixed(5) }}</p>
       </div>
       <button v-show="!isStart" class="btn" @click="startTimer()">Start</button>
-      <button v-show="isStart" id="testBtn" class="btn" @click="stopTimer()">
+      <button v-show="isStart" id="btn" class="btn" @click="stopTimer()">
         Stop
       </button>
+      <button v-show="mode.easy" @click="modeChange()">Normal</button>
+      <button v-show="mode.normal" @click="modeChange()">Hard</button>
+      <button v-show="mode.hard" @click="modeChange()">Easy</button>
     </div>
   </div>
 </template>
@@ -35,10 +39,20 @@ export default {
       score: 0, // 絶対値で取得
       settingSeconds: 1.0, // 設定値
       showCracker: false, // クラッカーの発火条件
+      // 難易度設定
+      mode: {
+        easy: true,
+        normal: false,
+        hard: false
+      },
+      hard: false
     }
   },
   methods: {
     startTimer() {
+      if (this.mode.hard) {
+        this.hard = true
+      }
       this.showCracker = false
       console.log(this.timer)
       this.isStart = true
@@ -49,24 +63,52 @@ export default {
     },
     stopTimer() {
       this.isStart = false
+      this.hard = false
       clearInterval(this.timer)
-      console.log('interval:' + this.interval.toFixed(5))
-      console.log('timer:' + this.timer.toFixed(5))
       this.resultScore()
+      sessionStorage.setItem('time', this.interval)
     },
     /**
      * 計測時間でスコアを決める
      */
     resultScore() {
-      this.diffSecconds = (this.interval - this.settingSeconds).toFixed(3)
-      this.score = Math.abs(this.diffSecconds)
+      if (this.mode.easy) {
+        this.diffSecconds = (this.interval - this.settingSeconds).toFixed(3)
+        this.score = Math.abs(this.diffSecconds)
+        if (this.score < 0.1) {
+        this.showCracker = true
+      }
+      }else {
+        this.diffSecconds = (this.interval - this.settingSeconds).toFixed(5)
+        this.score = Math.abs(this.diffSecconds)
+        if (this.score < 0.01) {
+        this.showCracker = true
+        }
+      }
 
       console.log('スコア:' + this.diffSecconds)
       console.log('絶対値：' + this.score)
-      if (this.score < 0.1) {
-        this.showCracker = true
-      }
+
+
+      
     },
+    /**
+     * モードを切り替える
+     */
+    modeChange() {
+      // 切り替えたタイミングで0に戻す？
+      this.interval = 0
+      if (this.mode.easy) {
+        this.mode.easy = false
+        this.mode.normal = true
+      }else if (this.mode.normal) {
+        this.mode.normal = false
+        this.mode.hard = true
+      }else {
+      this.mode.hard = false
+      this.mode.easy = true
+      }
+    }
   },
 }
 </script>
@@ -97,15 +139,16 @@ export default {
   width: 206px;
   height: 155px;
   border-radius: 11px 11px 11px 11px;
-  background-color: #507947;
+  background-color: #A9A9A9;
+  border: solid 1.5em #000000;
 }
 .timer {
   font-size: 20px;
   font-family: 'Press Start 2P', cursive;
-  margin-top: 50px;
+  margin-top: 35px;
 }
 .btn {
-  margin-top: 200px;
+  margin-top: 250px;
 }
 html,
 body {
