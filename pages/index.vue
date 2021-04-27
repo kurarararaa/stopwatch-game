@@ -24,12 +24,13 @@
 
 <script>
 import CrackerBackground from '~/components/CrackerBackground.vue'
+import sortBy from 'lodash/sortBy'
+import moment from 'moment'
 export default {
   components: {
     CrackerBackground,
   },
   data() {
-    str: String
     return {
       isStart: false, // 実行状態
       start: 0, // スタートの時間を記録
@@ -45,6 +46,7 @@ export default {
         normal: false,
         hard: false
       },
+      dataList: [],
       hard: false
     }
   },
@@ -66,14 +68,13 @@ export default {
       this.hard = false
       clearInterval(this.timer)
       this.resultScore()
-      sessionStorage.setItem('time', this.interval)
     },
     /**
      * 計測時間でスコアを決める
      */
     resultScore() {
       if (this.mode.easy) {
-        this.diffSecconds = (this.interval - this.settingSeconds).toFixed(3)
+        this.diffSecconds = (this.interval - this.settingSeconds).toFixed(5)
         this.score = Math.abs(this.diffSecconds)
         if (this.score < 0.1) {
         this.showCracker = true
@@ -89,7 +90,10 @@ export default {
       console.log('スコア:' + this.diffSecconds)
       console.log('絶対値：' + this.score)
 
-
+      // ローカルストレージ
+      const date = moment().format('YYYY/MM/DD');
+      this.dataList.push({key:date, time:this.interval.toFixed(5) ,score: this.score})
+      localStorage.setItem("dataList", JSON.stringify(sortBy(this.dataList, ['score'])));
       
     },
     /**
@@ -150,11 +154,14 @@ export default {
 .btn {
   margin-top: 250px;
 }
-html,
-body {
-  padding: 0;
-  margin: 0;
-  height: 100%;
+
+.hoge-tarou {
+  position: relative;
+  /* width: 2492px;
+  height: 402px;
+  margin: 0 auto; */
+  /* background-color: #6362628a; */
+  /* border-radius: 12px 12px 12px 12px; */
 }
 
 </style>
