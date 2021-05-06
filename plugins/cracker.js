@@ -71,9 +71,9 @@ const Particle = {
   velocity: null,
   gravity: null,
   create(x, y, speed, angle, grav) {
-    const obj = Object.create(this)
+    const obj = Object.create(this);
 
-    ;(obj.position = Vector.create(x, y)), (obj.velocity = Vector.create(0, 0))
+    (obj.position = Vector.create(x, y)), (obj.velocity = Vector.create(0, 0))
     obj.gravity = Vector.create(0, grav || 0)
 
     obj.velocity.setLength(speed)
@@ -92,7 +92,7 @@ const crack = function (el, x, y) {
   const w = (el.width = window.innerWidth)
   const h = (el.height = window.innerHeight)
 
-  context.fillStyle = 'rgb(5,10,25)'
+  // context.fillStyle = 'rgb(5,10,25)'
   context.fillRect(0, 0, w, h)
 
   var x = x
@@ -114,14 +114,14 @@ const crack = function (el, x, y) {
   }
 
   update()
-  context.fillStyle = 'rgb(5,10,25)'
+  // context.fillStyle = 'rgb(5,10,25)'
   context.fillRect(0, 0, w, h)
   var r = 1.5
 
   function update() {
     context.clearRect(0, 0, w, h)
     context.save()
-    context.fillStyle = 'rgb(5,10,25)'
+    // context.fillStyle = 'rgb(5,10,25)'
     context.fillRect(0, 0, w, h)
 
     context.translate(x, y)
@@ -175,7 +175,7 @@ const CrackerDirective = {
     const w = (el.width = window.innerWidth)
     const h = (el.height = window.innerHeight)
 
-    context.fillStyle = 'rgb(5,10,25)'
+    // context.fillStyle = 'rgb(5,10,25)'
     context.fillRect(0, 0, w, h)
 
     Vue.nextTick(function () {

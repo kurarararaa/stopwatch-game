@@ -18,6 +18,7 @@
       <button v-show="mode.easy" @click="modeChange()">Normal</button>
       <button v-show="mode.normal" @click="modeChange()">Hard</button>
       <button v-show="mode.hard" @click="modeChange()">Easy</button>
+      <button @click="login()">ログイン</button>
     </div>
   </div>
 </template>
@@ -25,7 +26,9 @@
 <script>
 import CrackerBackground from '~/components/CrackerBackground.vue'
 import sortBy from 'lodash/sortBy'
-import moment from 'moment'
+import firebase from '~/plugins/firebase'
+import auth from '~/plugins/auth'
+// import moment from 'moment'
 export default {
   components: {
     CrackerBackground,
@@ -91,9 +94,9 @@ export default {
       console.log('絶対値：' + this.score)
 
       // ローカルストレージ
-      const date = moment().format('YYYY/MM/DD');
-      this.dataList.push({key:date, time:this.interval.toFixed(5) ,score: this.score})
-      localStorage.setItem("dataList", JSON.stringify(sortBy(this.dataList, ['score'])));
+      // const date = moment().format('YYYY/MM/DD');
+      // this.dataList.push({key:date, time:this.interval.toFixed(5) ,score: this.score})
+      // localStorage.setItem("dataList", JSON.stringify(sortBy(this.dataList, ['score'])));
       
     },
     /**
@@ -112,8 +115,27 @@ export default {
       this.mode.hard = false
       this.mode.easy = true
       }
-    }
+    },
+    login() {
+      firebase
+      .auth()
+      .signInWithPopup(new firebase.auth.GoogleAuthProvider())
+      .then((res) => {
+      // 成功
+      console.log('ログイン成功', res)
+      })
+      .catch((error) => {
+      // 失敗
+      })
   },
+  logout() {
+    firebase
+      .auth()
+      .signOut()
+      .then((res) => {
+      })
+  },
+}
 }
 </script>
 
