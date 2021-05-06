@@ -28,7 +28,7 @@ import CrackerBackground from '~/components/CrackerBackground.vue'
 import sortBy from 'lodash/sortBy'
 import firebase from '~/plugins/firebase'
 import auth from '~/plugins/auth'
-// import moment from 'moment'
+import moment from 'moment'
 export default {
   components: {
     CrackerBackground,
@@ -52,6 +52,11 @@ export default {
       dataList: [],
       hard: false
     }
+  },
+  mounted() {
+    auth().then((user) => {
+      const isAuth = !!user
+    })
   },
   methods: {
     startTimer() {
@@ -94,9 +99,9 @@ export default {
       console.log('絶対値：' + this.score)
 
       // ローカルストレージ
-      // const date = moment().format('YYYY/MM/DD');
-      // this.dataList.push({key:date, time:this.interval.toFixed(5) ,score: this.score})
-      // localStorage.setItem("dataList", JSON.stringify(sortBy(this.dataList, ['score'])));
+      const date = moment().format('YYYY/MM/DD');
+      this.dataList.push({key:date, time:this.interval.toFixed(5) ,score: this.score})
+      localStorage.setItem("dataList", JSON.stringify(sortBy(this.dataList, ['score'])));
       
     },
     /**
