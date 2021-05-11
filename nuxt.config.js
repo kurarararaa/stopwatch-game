@@ -17,9 +17,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [
-    '~/plugins/cracker.js',
-  ],
+  plugins: ['~/plugins/cracker.js'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -30,7 +28,7 @@ export default {
     // '@nuxtjs/eslint-module',
     // // https://go.nuxtjs.dev/stylelint
     // '@nuxtjs/stylelint-module',
-    '@nuxtjs/moment'
+    '@nuxtjs/moment',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -56,10 +54,10 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    vendor: ['moment', 'lodash']
+    vendor: ['moment', 'lodash'],
   },
   // moment
   moment: {
-    locales: ['ja']
+    locales: ['ja'],
   },
 }

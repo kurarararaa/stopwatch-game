@@ -8,8 +8,10 @@
     <CrackerBackground :show-cracker="showCracker" />
     <div class="game-boy">
       <div class="game-boy-screen">
-        <p class="timer" v-show="mode.easy">{{ interval.toFixed(3) }}</p>
-        <p class="timer" v-show="!mode.easy && !hard">{{ interval.toFixed(5) }}</p>
+        <p v-show="mode.easy" class="timer">{{ interval.toFixed(3) }}</p>
+        <p v-show="!mode.easy && !hard" class="timer">
+          {{ interval.toFixed(5) }}
+        </p>
       </div>
       <button v-show="!isStart" class="btn" @click="startTimer()">Start</button>
       <button v-show="isStart" id="btn" class="btn" @click="stopTimer()">
@@ -24,14 +26,18 @@
 </template>
 
 <script>
-import CrackerBackground from '~/components/CrackerBackground.vue'
 import sortBy from 'lodash/sortBy'
+import moment from 'moment'
+import { mapState, mapActions } from 'vuex'
+import CrackerBackground from '~/components/CrackerBackground.vue'
 import firebase from '~/plugins/firebase'
 import auth from '~/plugins/auth'
-import moment from 'moment'
 export default {
   components: {
     CrackerBackground,
+  },
+  computed: {
+    ...mapState('ranking', ['ranking']),
   },
   data() {
     return {
@@ -47,10 +53,11 @@ export default {
       mode: {
         easy: true,
         normal: false,
-        hard: false
+        hard: false,
       },
       dataList: [],
-      hard: false
+      data: 0, // 日付
+      hard: false,
     }
   },
   mounted() {
@@ -85,13 +92,13 @@ export default {
         this.diffSecconds = (this.interval - this.settingSeconds).toFixed(5)
         this.score = Math.abs(this.diffSecconds)
         if (this.score < 0.1) {
-        this.showCracker = true
-      }
-      }else {
+          this.showCracker = true
+        }
+      } else {
         this.diffSecconds = (this.interval - this.settingSeconds).toFixed(5)
         this.score = Math.abs(this.diffSecconds)
         if (this.score < 0.01) {
-        this.showCracker = true
+          this.showCracker = true
         }
       }
 
@@ -99,10 +106,27 @@ export default {
       console.log('絶対値：' + this.score)
 
       // ローカルストレージ
-      const date = moment().format('YYYY/MM/DD');
-      this.dataList.push({key:date, time:this.interval.toFixed(5) ,score: this.score})
-      localStorage.setItem("dataList", JSON.stringify(sortBy(this.dataList, ['score'])));
-      
+      this.date = moment().format('YYYY/MM/DD')
+      this.dataList.push({
+        key: this.date,
+        time: this.interval.toFixed(5),
+        score: this.score,
+      })
+      localStorage.setItem(
+        'dataList',
+        JSON.stringify(sortBy(this.dataList, ['score']))
+      )
+      this.insert({
+        // ★登録する内容
+        タイム: this.interval.toFixed(5),
+      })
+        .then((docRef) => {
+          // 保存成功時
+          console.log('DB登録成功')
+        })
+        .catch((error) => {
+          // 失敗時
+        })
     },
     /**
      * モードを切り替える
@@ -113,34 +137,34 @@ export default {
       if (this.mode.easy) {
         this.mode.easy = false
         this.mode.normal = true
-      }else if (this.mode.normal) {
+      } else if (this.mode.normal) {
         this.mode.normal = false
         this.mode.hard = true
-      }else {
-      this.mode.hard = false
-      this.mode.easy = true
+      } else {
+        this.mode.hard = false
+        this.mode.easy = true
       }
     },
     login() {
       firebase
-      .auth()
-      .signInWithPopup(new firebase.auth.GoogleAuthProvider())
-      .then((res) => {
-      // 成功
-      console.log('ログイン成功', res)
-      })
-      .catch((error) => {
-      // 失敗
-      })
+        .auth()
+        .signInWithPopup(new firebase.auth.GoogleAuthProvider())
+        .then((res) => {
+          // 成功
+          console.log('ログイン成功', res)
+        })
+        .catch((error) => {
+          // 失敗
+        })
+    },
+    logout() {
+      firebase
+        .auth()
+        .signOut()
+        .then((res) => {})
+    },
+    ...mapActions('ranking', ['insert', 'onSnapshot', 'stopSnapshot']),
   },
-  logout() {
-    firebase
-      .auth()
-      .signOut()
-      .then((res) => {
-      })
-  },
-}
 }
 </script>
 
@@ -170,7 +194,7 @@ export default {
   width: 206px;
   height: 155px;
   border-radius: 11px 11px 11px 11px;
-  background-color: #A9A9A9;
+  background-color: #a9a9a9;
   border: solid 1.5em #000000;
 }
 .timer {
@@ -190,5 +214,4 @@ export default {
   /* background-color: #6362628a; */
   /* border-radius: 12px 12px 12px 12px; */
 }
-
 </style>

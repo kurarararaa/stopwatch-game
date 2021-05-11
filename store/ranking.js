@@ -21,7 +21,7 @@ export const mutations = {
 }
 export const actions = {
   async onSnapshot({ commit }) {
-    this.unsubscribe = await db.collection('ranking').onSnapshot(
+    this.unsubscribe = await db.collection('time-ranking').onSnapshot(
       (snapshot) => {
         _(snapshot.docs).forEach((doc) => {
           const ranking = doc.data()
@@ -39,9 +39,10 @@ export const actions = {
     await this.unsubscribe()
   },
   async insert({ commit }, ranking) {
-    return await db.collection('ranking').add(ranking)
+    debugger
+    return await db.collection('time-ranking').add(ranking)
   },
   async delete({ commit }, id) {
-    await db.collection('ranking').doc(id).delete()
+    await db.collection('time-ranking').doc(id).delete()
   },
 }

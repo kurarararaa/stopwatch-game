@@ -71,9 +71,9 @@ const Particle = {
   velocity: null,
   gravity: null,
   create(x, y, speed, angle, grav) {
-    const obj = Object.create(this);
+    const obj = Object.create(this)
 
-    (obj.position = Vector.create(x, y)), (obj.velocity = Vector.create(0, 0))
+    ;(obj.position = Vector.create(x, y)), (obj.velocity = Vector.create(0, 0))
     obj.gravity = Vector.create(0, grav || 0)
 
     obj.velocity.setLength(speed)
@@ -183,7 +183,7 @@ const CrackerDirective = {
        * メモ
        * クラッカーの個数をスコアを基準に区別したい
        */
-      
+
       if (binding.arg) {
         crack(el, 1000, 100)
         setTimeout(function () {
