@@ -39,8 +39,10 @@ export const actions = {
     await this.unsubscribe()
   },
   async insert({ commit }, ranking) {
-    debugger
     return await db.collection('time-ranking').add(ranking)
+  },
+  async selectAll({ commit }) {
+    console.log(await db.collection('time-ranking').get())
   },
   async delete({ commit }, id) {
     await db.collection('time-ranking').doc(id).delete()

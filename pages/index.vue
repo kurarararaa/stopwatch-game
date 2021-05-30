@@ -56,6 +56,7 @@ export default {
         hard: false,
       },
       dataList: [],
+      timeRankingList: [], // firestoreからのデータ受け取り
       data: 0, // 日付
       hard: false,
     }
@@ -107,6 +108,7 @@ export default {
 
       // ローカルストレージ
       this.date = moment().format('YYYY/MM/DD')
+      this.dataList = JSON.parse(localStorage.getItem('dataList'))
       this.dataList.push({
         key: this.date,
         time: this.interval.toFixed(5),
@@ -120,6 +122,7 @@ export default {
         // ★登録する内容
         タイム: this.interval.toFixed(5),
       })
+      this.selectAll()
         .then((docRef) => {
           // 保存成功時
           console.log('DB登録成功')
@@ -163,7 +166,7 @@ export default {
         .signOut()
         .then((res) => {})
     },
-    ...mapActions('ranking', ['insert', 'onSnapshot', 'stopSnapshot']),
+    ...mapActions('ranking', ['selectAll', 'insert', 'onSnapshot', 'stopSnapshot']),
   },
 }
 </script>
