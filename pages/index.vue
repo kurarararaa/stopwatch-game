@@ -22,6 +22,9 @@
       <button v-show="mode.hard" @click="modeChange()">Easy</button>
       <button @click="login()">ログイン</button>
     </div>
+    <div class="ranking-area">
+      <p>ここにランキング表示</p>
+    </div>
   </div>
 </template>
 
@@ -120,7 +123,7 @@ export default {
       )
       this.insert({
         // ★登録する内容
-        タイム: this.interval.toFixed(5),
+        time: this.interval.toFixed(5),
       })
       this.selectAll()
         .then((docRef) => {
@@ -209,12 +212,13 @@ export default {
   margin-top: 250px;
 }
 
-.hoge-tarou {
+/* ゲームボーイ */
+.ranking-area {
   position: relative;
-  /* width: 2492px;
+  width: 242px;
   height: 402px;
-  margin: 0 auto; */
-  /* background-color: #6362628a; */
-  /* border-radius: 12px 12px 12px 12px; */
+  margin: 0 auto;
+  background-color: #6362628a;
+  border-radius: 12px 12px 12px 12px;
 }
 </style>
