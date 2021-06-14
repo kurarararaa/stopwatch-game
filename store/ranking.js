@@ -2,7 +2,6 @@ import db from '~/plugins/db'
 export const state = () => ({
   ranking: [],
   unsubscribe: null,
-  timeRankingList: [],
 })
 export const mutations = {
   update(state, args) {
@@ -46,14 +45,16 @@ export const actions = {
     db.collection("time-ranking").get().then((query) => {
       var buff = [];
       query.forEach((doc) => {
-        var data = doc.data();
-        buff.push([doc.id, data.time, data.age]);
+        var data = doc.data()
+        // buffの中に参照したデータをセット
+        buff.push([doc.id, data.time])
       });
-      console.log(buff);
+      // console.log(buff)
+      return buff
     })
-    .catch((error)=>{
-      console.log(`データの取得に失敗しました (${error})`);
-    });
+      .catch((error) => {
+        console.log(`データの取得に失敗しました (${error})`);
+      });
 
 
   },

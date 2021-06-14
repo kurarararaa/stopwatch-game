@@ -17,13 +17,20 @@
       <button v-show="isStart" id="btn" class="btn" @click="stopTimer()">
         Stop
       </button>
-      <button v-show="mode.easy" @click="modeChange()">Normal</button>
-      <button v-show="mode.normal" @click="modeChange()">Hard</button>
+      <button v-show="mode.easy" @click="modeChange()">Easy</button>
+      <button v-show="mode.normal" @click="modeChange()">Nomal</button>
       <button v-show="mode.hard" @click="modeChange()">Easy</button>
       <button @click="login()">ログイン</button>
     </div>
     <div class="ranking-area">
-      <p>ここにランキング表示</p>
+      <ul>
+    <li
+      v-for="data of top3"
+      :key="data.key"
+    >
+      {{ data.time }}
+    </li>
+  </ul>
     </div>
   </div>
 </template>
@@ -41,6 +48,10 @@ export default {
   },
   computed: {
     ...mapState('ranking', ['ranking']),
+    // 記録を何位まで出すか
+    top3() {
+      return this.dataList.slice(0, 3)
+    },
   },
   data() {
     return {
@@ -94,7 +105,8 @@ export default {
     resultScore() {
       if (this.mode.easy) {
         this.diffSecconds = (this.interval - this.settingSeconds).toFixed(5)
-        this.score = Math.abs(this.diffSecconds)
+        this.score = 1 - this.diffSecconds
+        // this.score = Math.abs(this.diffSecconds)
         if (this.score < 0.1) {
           this.showCracker = true
         }
@@ -111,7 +123,8 @@ export default {
 
       // ローカルストレージ
       this.date = moment().format('YYYY/MM/DD')
-      this.dataList = JSON.parse(localStorage.getItem('dataList'))
+      // 最初にローカルストレージから値を取得
+      // this.dataList = JSON.parse(localStorage.getItem('dataList'))
       this.dataList.push({
         key: this.date,
         time: this.interval.toFixed(5),
@@ -121,11 +134,11 @@ export default {
         'dataList',
         JSON.stringify(sortBy(this.dataList, ['score']))
       )
-      this.insert({
-        // ★登録する内容
-        time: this.interval.toFixed(5),
-      })
-      this.selectAll()
+      // this.insert({
+      //   // ★登録する内容
+      //   time: this.interval.toFixed(5),
+      // })
+      this.timeRankingList = this.selectAll()
         .then((docRef) => {
           // 保存成功時
           console.log('DB登録成功')
@@ -133,6 +146,9 @@ export default {
         .catch((error) => {
           // 失敗時
         })
+        // help
+        // timeRankingListの戻りが、ranking.jsのbuffと同じであってほしい
+        console.log(this.timeRankingList)
     },
     /**
      * モードを切り替える
@@ -212,7 +228,7 @@ export default {
   margin-top: 250px;
 }
 
-/* ゲームボーイ */
+/* ランキングエリア */
 .ranking-area {
   position: relative;
   width: 242px;
@@ -220,5 +236,6 @@ export default {
   margin: 0 auto;
   background-color: #6362628a;
   border-radius: 12px 12px 12px 12px;
+  color: white;
 }
 </style>
