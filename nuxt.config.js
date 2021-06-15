@@ -19,7 +19,10 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/cracker.js'],
+  plugins: [
+    { src: '~/plugins/persistedstate.js', ssr: false },
+    '~/plugins/cracker.js',
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
