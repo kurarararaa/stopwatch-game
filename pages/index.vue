@@ -24,13 +24,10 @@
     </div>
     <div class="ranking-area">
       <ul>
-    <li
-      v-for="data of top3"
-      :key="data.key"
-    >
-      {{ data.time }}
-    </li>
-  </ul>
+        <li v-for="data of top3" :key="data.key">
+          {{ data.time }}
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -38,7 +35,7 @@
 <script>
 import sortBy from 'lodash/sortBy'
 import moment from 'moment'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import CrackerBackground from '~/components/CrackerBackground.vue'
 import firebase from '~/plugins/firebase'
 import auth from '~/plugins/auth'
@@ -48,10 +45,11 @@ export default {
   },
   computed: {
     ...mapState('ranking', ['ranking']),
+    ...mapGetters('localRanking', ['top3']),
     // 記録を何位まで出すか
-    top3() {
-      return this.dataList.slice(0, 3)
-    },
+    // top3() {
+    //   return this.dataList.slice(0, 3)
+    // },
   },
   data() {
     return {
@@ -75,11 +73,6 @@ export default {
       hard: false,
     }
   },
-  mounted() {
-    auth().then((user) => {
-      this.isAuth = !!user
-    })
-  },
   watch: {
     isAuth(val, oldVal) {
       // 認証がありの場合のみFirestoreのスナップショットを開始する
@@ -89,6 +82,11 @@ export default {
         this.stopSnapshot()
       }
     },
+  },
+  mounted() {
+    auth().then((user) => {
+      this.isAuth = !!user
+    })
   },
   methods: {
     startTimer() {
@@ -135,15 +133,22 @@ export default {
       this.date = moment().format('YYYY/MM/DD')
       // 最初にローカルストレージから値を取得
       // this.dataList = JSON.parse(localStorage.getItem('dataList'))
-      this.dataList.push({
+      // this.dataList.push({
+      //   key: this.date,
+      //   time: this.interval.toFixed(5),
+      //   score: this.score,
+      // })
+      // localStorage.setItem(
+      //   'dataList',
+      //   JSON.stringify(sortBy(this.dataList, ['score']))
+      // )
+      // 個人ランキングの登録
+      this.addLocalRanking({
         key: this.date,
         time: this.interval.toFixed(5),
         score: this.score,
       })
-      localStorage.setItem(
-        'dataList',
-        JSON.stringify(sortBy(this.dataList, ['score']))
-      )
+
       this.insert({
         // ★登録する内容
         time: this.interval.toFixed(5),
@@ -156,9 +161,9 @@ export default {
         .catch((error) => {
           // 失敗時
         })
-        // help
-        // timeRankingListの戻りが、ranking.jsのbuffと同じであってほしい
-        console.log(this.ranking)
+      // help
+      // timeRankingListの戻りが、ranking.jsのbuffと同じであってほしい
+      console.log(this.ranking)
     },
     /**
      * モードを切り替える
@@ -195,7 +200,13 @@ export default {
         .signOut()
         .then((res) => {})
     },
-    ...mapActions('ranking', ['selectAll', 'insert', 'onSnapshot', 'stopSnapshot']),
+    ...mapActions('ranking', [
+      'selectAll',
+      'insert',
+      'onSnapshot',
+      'stopSnapshot',
+    ]),
+    ...mapActions('localRanking', ['addLocalRanking']),
   },
 }
 </script>
