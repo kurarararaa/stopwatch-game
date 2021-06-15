@@ -55,6 +55,7 @@ export default {
   },
   data() {
     return {
+      isAuth: false, // 認証の有無
       isStart: false, // 実行状態
       start: 0, // スタートの時間を記録
       timer: 0, // setInterval()の格納用
@@ -70,15 +71,24 @@ export default {
         hard: false,
       },
       dataList: [],
-      timeRankingList: [], // firestoreからのデータ受け取り
       data: 0, // 日付
       hard: false,
     }
   },
   mounted() {
     auth().then((user) => {
-      const isAuth = !!user
+      this.isAuth = !!user
     })
+  },
+  watch: {
+    isAuth(val, oldVal) {
+      // 認証がありの場合のみFirestoreのスナップショットを開始する
+      if (val) {
+        this.onSnapshot()
+      } else {
+        this.stopSnapshot()
+      }
+    },
   },
   methods: {
     startTimer() {
@@ -134,21 +144,21 @@ export default {
         'dataList',
         JSON.stringify(sortBy(this.dataList, ['score']))
       )
-      // this.insert({
-      //   // ★登録する内容
-      //   time: this.interval.toFixed(5),
-      // })
+      this.insert({
+        // ★登録する内容
+        time: this.interval.toFixed(5),
+      })
       this.timeRankingList = this.selectAll()
         .then((docRef) => {
           // 保存成功時
-          console.log('DB登録成功')
+          console.log('DB登録成功', docRef)
         })
         .catch((error) => {
           // 失敗時
         })
         // help
         // timeRankingListの戻りが、ranking.jsのbuffと同じであってほしい
-        console.log(this.timeRankingList)
+        console.log(this.ranking)
     },
     /**
      * モードを切り替える
