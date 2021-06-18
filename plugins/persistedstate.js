@@ -8,9 +8,9 @@ export default ({ store, isHMR }) => {
   if (isHMR) return
 
   if (process.client) {
-    window.onNuxtReady(nuxt => {
+    window.onNuxtReady((nuxt) => {
       createPersistedState({
-        paths: ['localRanking']
+        paths: ['localRanking'],
       })(store)
     })
   }

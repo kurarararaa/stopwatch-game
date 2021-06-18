@@ -1,10 +1,13 @@
+import { _ } from "core-js"
+
 export const state = () => ({
   localRanking: [],
 })
 export const mutations = {
   add(state, args) {
     state.localRanking.push({
-      key: args.key,
+      playMode: args.playMode,
+      insertDate: args.insertDate,
       time: args.time,
       score: args.score,
     })
@@ -16,7 +19,13 @@ export const actions = {
   },
 }
 export const getters = {
-  top3(state) {
-    return _(state.localRanking).sortBy(['score']).reverse().slice(0, 3)
+  easyTop3(state) {
+    return _(state.localRanking).sortBy(['score']).filter(['playMode', 'easy']).slice(0, 3)
+  },
+  normalTop3(state) {
+    return _(state.localRanking).sortBy(['score']).filter(['playMode', 'normal']).slice(0, 3)
+  },
+  hardTop3(state) {
+    return _(state.localRanking).sortBy(['score']).filter(['playMode', 'hard']).slice(0, 3)
   },
 }

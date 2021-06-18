@@ -6,28 +6,36 @@
     />
     <cracker-background />
     <CrackerBackground :show-cracker="showCracker" />
-    <div class="game-boy">
-      <div class="game-boy-screen">
-        <p v-show="mode.easy" class="timer">{{ interval.toFixed(3) }}</p>
-        <p v-show="!mode.easy && !hard" class="timer">
-          {{ interval.toFixed(5) }}
-        </p>
+      <div class="stop-watch">
+        <div class="game-boy">
+          <div class="game-boy-screen">
+            <p v-show="mode.easy" class="timer">{{ interval.toFixed(3) }}</p>
+            <p v-show="!mode.easy && !hard" class="timer">
+              {{ interval.toFixed(5) }}
+            </p>
+          </div>
+          <button v-show="!isStart" class="btn" @click="startTimer()">Start</button>
+          <button v-show="isStart" class="btn" @click="stopTimer()">Stop</button>
+          <button v-show="mode.easy" @click="modeChange()">Easy</button>
+          <button v-show="mode.normal" @click="modeChange()">Nomal</button>
+          <button v-show="mode.hard" @click="modeChange()">Hard</button>
+          <button v-show="!isAuth" @click="login()">ログイン</button>
+          <button v-show="isAuth" @click="logout()">ログイン済み</button>
+        </div>
       </div>
-      <button v-show="!isStart" class="btn" @click="startTimer()">Start</button>
-      <button v-show="isStart" id="btn" class="btn" @click="stopTimer()">
-        Stop
-      </button>
-      <button v-show="mode.easy" @click="modeChange()">Easy</button>
-      <button v-show="mode.normal" @click="modeChange()">Nomal</button>
-      <button v-show="mode.hard" @click="modeChange()">Easy</button>
-      <button @click="login()">ログイン</button>
-    </div>
     <div class="ranking-area">
-      <ul>
-        <li v-for="data of top3" :key="data.key">
-          {{ data.time }}
-        </li>
-      </ul>
+      <div v-show="mode.easy" v-for="(data, index) in easyTop3" :key="data.insertDate">
+        {{ data.time }}<br>
+      </div>
+      <div v-show="mode.easy" v-for="(data) in worldTop3">
+        {{ data }}<br>
+      </div>
+      <div v-show="mode.normal" v-for="(data, index) in normalTop3" :key="data.insertDate">
+        {{ data.time }}<br>
+      </div>
+      <div v-show="mode.hard" v-for="(data, index) in hardTop3" :key="data.insertDate">
+        {{ data.time }}<br>
+      </div>
     </div>
   </div>
 </template>
@@ -44,12 +52,8 @@ export default {
     CrackerBackground,
   },
   computed: {
-    ...mapState('ranking', ['ranking']),
-    ...mapGetters('localRanking', ['top3']),
-    // 記録を何位まで出すか
-    // top3() {
-    //   return this.dataList.slice(0, 3)
-    // },
+    ...mapState('ranking', ['ranking', 'worldTop3']),
+    ...mapGetters('localRanking', ['easyTop3', 'normalTop3', 'hardTop3']),
   },
   data() {
     return {
@@ -58,7 +62,6 @@ export default {
       start: 0, // スタートの時間を記録
       timer: 0, // setInterval()の格納用
       interval: 0, // タイマー表示用
-      diffSecconds: 9999999, // 基準値との差
       score: 0, // 絶対値で取得
       settingSeconds: 1.0, // 設定値
       showCracker: false, // クラッカーの発火条件
@@ -68,9 +71,9 @@ export default {
         normal: false,
         hard: false,
       },
-      dataList: [],
       data: 0, // 日付
       hard: false,
+      getterList: []
     }
   },
   watch: {
@@ -94,7 +97,7 @@ export default {
         this.hard = true
       }
       this.showCracker = false
-      console.log(this.timer)
+      console.log(this.mode.easy)
       this.isStart = true
       this.start = performance.now()
       this.timer = setInterval(() => {
@@ -112,58 +115,40 @@ export default {
      */
     resultScore() {
       if (this.mode.easy) {
-        this.diffSecconds = (this.interval - this.settingSeconds).toFixed(5)
-        this.score = 1 - this.diffSecconds
-        // this.score = Math.abs(this.diffSecconds)
+        this.score = (this.settingSeconds - this.interval).toFixed(5)
+        this.score = Math.abs(this.score)
         if (this.score < 0.1) {
           this.showCracker = true
         }
       } else {
-        this.diffSecconds = (this.interval - this.settingSeconds).toFixed(5)
-        this.score = Math.abs(this.diffSecconds)
+        this.score = (this.settingSeconds - this.interval).toFixed(5)
+        this.score = Math.abs(this.score)
         if (this.score < 0.01) {
           this.showCracker = true
         }
       }
-
-      console.log('スコア:' + this.diffSecconds)
       console.log('絶対値：' + this.score)
 
       // ローカルストレージ
       this.date = moment().format('YYYY/MM/DD')
-      // 最初にローカルストレージから値を取得
-      // this.dataList = JSON.parse(localStorage.getItem('dataList'))
-      // this.dataList.push({
-      //   key: this.date,
-      //   time: this.interval.toFixed(5),
-      //   score: this.score,
-      // })
-      // localStorage.setItem(
-      //   'dataList',
-      //   JSON.stringify(sortBy(this.dataList, ['score']))
-      // )
       // 個人ランキングの登録
       this.addLocalRanking({
-        key: this.date,
+        playMode: (this.mode.easy) ? 'easy' : (this.mode.normal) ? 'normal' : 'hard',
+        insertDate: this.date,
         time: this.interval.toFixed(5),
         score: this.score,
       })
-
       this.insert({
         // ★登録する内容
         time: this.interval.toFixed(5),
       })
-      this.timeRankingList = this.selectAll()
-        .then((docRef) => {
-          // 保存成功時
-          console.log('DB登録成功', docRef)
-        })
-        .catch((error) => {
-          // 失敗時
-        })
-      // help
-      // timeRankingListの戻りが、ranking.jsのbuffと同じであってほしい
-      console.log(this.ranking)
+      .then((docRef) => {
+        // 保存成功時
+        console.log('DB登録成功')
+      })
+      .catch((error) => {
+        // 失敗時
+      })
     },
     /**
      * モードを切り替える
@@ -181,6 +166,7 @@ export default {
         this.mode.hard = false
         this.mode.easy = true
       }
+      console.log(this.ranking[0].time)
     },
     login() {
       firebase
@@ -188,7 +174,8 @@ export default {
         .signInWithPopup(new firebase.auth.GoogleAuthProvider())
         .then((res) => {
           // 成功
-          console.log('ログイン成功', res)
+          console.log('ログイン成功', res, this.isAuth)
+          this.isAuth = !this.isAuth
         })
         .catch((error) => {
           // 失敗
@@ -198,7 +185,10 @@ export default {
       firebase
         .auth()
         .signOut()
-        .then((res) => {})
+        .then((res) => {
+          console.log('ログアウト成功', this.isAuth)
+          this.isAuth = !this.isAuth
+        })
     },
     ...mapActions('ranking', [
       'selectAll',
@@ -221,12 +211,17 @@ export default {
   text-align: center;
 }
 
+.stop-watch {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
 /* ゲームボーイ */
 .game-boy {
-  position: relative;
+  position: absolute;
   width: 242px;
   height: 402px;
-  margin: 0 auto;
   background-color: #6362628a;
   border-radius: 12px 12px 12px 12px;
 }
@@ -251,12 +246,13 @@ export default {
 
 /* ランキングエリア */
 .ranking-area {
-  position: relative;
+  position: absolute;
   width: 242px;
-  height: 402px;
-  margin: 0 auto;
-  background-color: #6362628a;
+  height: 150px;
+  background-color: #e6e6fa;
   border-radius: 12px 12px 12px 12px;
   color: white;
+  top: 450px;
+  left: 10px;
 }
 </style>

@@ -41,24 +41,12 @@ export const actions = {
   async insert({ commit }, ranking) {
     return await db.collection('time-ranking').add(ranking)
   },
-  async selectAll({ commit }) {
-    db.collection("time-ranking").get().then((query) => {
-      var buff = [];
-      query.forEach((doc) => {
-        var data = doc.data()
-        // buffの中に参照したデータをセット
-        buff.push([doc.id, data.time])
-      });
-      // console.log(buff)
-      return buff
-    })
-      .catch((error) => {
-        console.log(`データの取得に失敗しました (${error})`);
-      });
-
-
-  },
   async delete({ commit }, id) {
     await db.collection('time-ranking').doc(id).delete()
+  },
+}
+export const getters = {
+  worldTop3(state) {
+    return _(state.ranking)
   },
 }
