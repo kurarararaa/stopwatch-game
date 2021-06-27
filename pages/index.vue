@@ -24,16 +24,16 @@
         </div>
       </div>
     <div class="ranking-area">
-      <div v-show="mode.easy" v-for="(data, index) in easyTop3" :key="data.insertDate">
+      <div v-show="mode.easy" v-for="(data) in easyTop3" :key="data.insertDate">
         {{ data.time }}<br>
       </div>
       <div v-show="mode.easy" v-for="(data) in worldTop3">
         {{ data }}<br>
       </div>
-      <div v-show="mode.normal" v-for="(data, index) in normalTop3" :key="data.insertDate">
+      <div v-show="mode.normal" v-for="(data) in normalTop3" :key="data.insertDate">
         {{ data.time }}<br>
       </div>
-      <div v-show="mode.hard" v-for="(data, index) in hardTop3" :key="data.insertDate">
+      <div v-show="mode.hard" v-for="(data) in hardTop3" :key="data.insertDate">
         {{ data.time }}<br>
       </div>
     </div>
@@ -141,10 +141,12 @@ export default {
       this.insert({
         // ★登録する内容
         time: this.interval.toFixed(5),
+        mode: this.mode.easy ? 'easy' : this.mode.normal ? 'normal' : 'hard',
       })
       .then((docRef) => {
         // 保存成功時
         console.log('DB登録成功')
+        console.log(this.ranking[0].time)
       })
       .catch((error) => {
         // 失敗時
@@ -166,7 +168,6 @@ export default {
         this.mode.hard = false
         this.mode.easy = true
       }
-      console.log(this.ranking[0].time)
     },
     login() {
       firebase

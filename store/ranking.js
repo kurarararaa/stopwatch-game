@@ -10,7 +10,6 @@ export const mutations = {
         .filter(['id', args.id])
         .forEach((e) => {
           _(args).keys((key) => {
-            console.log(key)
             e[key] = args[key]
           })
         })
