@@ -20,12 +20,12 @@ export const actions = {
 }
 export const getters = {
   easyTop3(state) {
-    return _(state.localRanking).sortBy(['score']).filter(['playMode', 'easy']).slice(0, 3)
+    return _(state.localRanking).sortBy(['score']).filter(['playMode', 'easy']).slice(0, 3).value()
   },
   normalTop3(state) {
-    return _(state.localRanking).sortBy(['score']).filter(['playMode', 'normal']).slice(0, 3)
+    return _(state.localRanking).sortBy(['score']).filter(['playMode', 'normal']).slice(0, 3).value()
   },
   hardTop3(state) {
-    return _(state.localRanking).sortBy(['score']).filter(['playMode', 'hard']).slice(0, 3)
+    return _(state.localRanking).sortBy(['score']).filter(['playMode', 'hard']).slice(0, 3).value()
   },
 }
